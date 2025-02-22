@@ -4,8 +4,8 @@ from load_pdf import load_pdf
 
 def split_text(documents: list[Document]):
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=240,
-        chunk_overlap=40,
+        chunk_size=24000,
+        chunk_overlap=4000,
         length_function=len,
         is_separator_regex=False
     )
