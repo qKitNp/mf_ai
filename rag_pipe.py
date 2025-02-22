@@ -57,6 +57,7 @@ def main():
 
 
 def query_rag(query_text: str):
+    print("Querying RAG with")
     # Prepare the DB.
     embedding_function = get_embeddings()
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
