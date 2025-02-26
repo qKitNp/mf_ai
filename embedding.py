@@ -5,7 +5,7 @@ import streamlit as st
 
 load_dotenv()
 
-GOOGLE_API_KEY = st.secrets["general"]["API_KEY"]
+GOOGLE_API_KEY = st.secrets["API_KEY"]
 
 def get_embeddings():
     embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
