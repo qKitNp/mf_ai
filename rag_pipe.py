@@ -59,16 +59,18 @@ def query_rag(query_text: str):
     os.write(1, f"Querying RAG with {query_text}\n".encode())
     # Prepare the DB.
     embedding_function = get_embeddings()
+    os.write(1, f"Got embeddings\n".encode())
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
+    os.write(1, f"Got DB\n".encode())
 
+    os.write(1, f"Searching DB\n".encode())
     # Search the DB.
     results = db.similarity_search_with_score(query_text, k=20)
-
+    os.write(1, f"Got results\n".encode())
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=query_text)
     # print(prompt)
-    os.write(1, f"API Key: {GOOGLE_API_KEY}\n".encode())
     model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", api_key=GOOGLE_API_KEY)
     os.write(1, f"Selected Model\n".encode())
     response_text = model.invoke(prompt).content
