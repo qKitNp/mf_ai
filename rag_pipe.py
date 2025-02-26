@@ -6,9 +6,8 @@ import argparse
 from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
-from dotenv import load_dotenv
 
-from embedding import get_embeddings
+from embedding import get_embeddings, GOOGLE_API_KEY
 
 CHROMA_PATH = "chroma"
 
@@ -70,7 +69,7 @@ def query_rag(query_text: str):
     prompt = prompt_template.format(context=context_text, question=query_text)
     # print(prompt)
 
-    model = ChatGoogleGenerativeAI(model="gemini-1.5-flash")
+    model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", api_key=GOOGLE_API_KEY)
     response_text = model.invoke(prompt).content
 
     sources = [doc.metadata.get("id", None) for doc, _score in results]
