@@ -6,7 +6,7 @@ import argparse
 from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
-
+import os
 from embedding import get_embeddings, GOOGLE_API_KEY
 
 CHROMA_PATH = "chroma"
@@ -56,7 +56,7 @@ def main():
 
 
 def query_rag(query_text: str):
-    print("Querying RAG with")
+    os.write(1, f"Querying RAG with {query_text}\n".encode())
     # Prepare the DB.
     embedding_function = get_embeddings()
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
@@ -68,8 +68,9 @@ def query_rag(query_text: str):
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=query_text)
     # print(prompt)
-
+    os.write(1, f"API Key: {GOOGLE_API_KEY}\n".encode())
     model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", api_key=GOOGLE_API_KEY)
+    os.write(1, f"Selected Model\n".encode())
     response_text = model.invoke(prompt).content
 
     sources = [doc.metadata.get("id", None) for doc, _score in results]
