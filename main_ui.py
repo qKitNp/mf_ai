@@ -6,7 +6,7 @@ import os
 from rag_pipe import query_rag
 
 
-st.write("# Hello, welcome to the RAG Chatbot!")
+st.write("# Hello, Search for mutual funds in natural language. ")
 query_text = st.text_input("## Enter your question:")
 
 if st.button("Submit"):
