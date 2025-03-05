@@ -7,7 +7,7 @@ from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
-from embedding import get_embeddings, GOOGLE_API_KEY
+from embedding import get_embeddings, GOOGLE_API_KEY, get_cohere_embeddings
 
 CHROMA_PATH = "chroma"
 
@@ -58,7 +58,7 @@ def main():
 def query_rag(query_text: str):
     os.write(1, f"Querying RAG with {query_text}\n".encode())
     # Prepare the DB.
-    embedding_function = get_embeddings()
+    embedding_function = get_cohere_embeddings()
     os.write(1, f"Got embeddings\n".encode())
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
     os.write(1, f"Got DB\n".encode())
