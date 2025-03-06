@@ -54,11 +54,13 @@ if prompt := st.chat_input("Ask me anything about mutual funds..."):
     with st.chat_message("user"):
         st.markdown(prompt)
     
-    # Get assistant response
+    # Get assistant response streamed
+    assistant_response = ""
     with st.spinner("Searching..."):
-        assistant_response = query_rag(prompt)
-    
-    with st.chat_message("assistant"):
-        st.markdown(assistant_response)
-    
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            for chunk in query_rag(prompt):
+                assistant_response += chunk
+                placeholder.markdown(assistant_response)
+
     st.session_state.messages.append({"role": "assistant", "content": assistant_response})

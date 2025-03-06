@@ -7,6 +7,7 @@ from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
+import time
 from embedding import get_embeddings, GOOGLE_API_KEY, get_cohere_embeddings
 
 CHROMA_PATH = "chroma"
@@ -56,29 +57,40 @@ def main():
 
 
 def query_rag(query_text: str):
-    os.write(1, f"Querying RAG with {query_text}\n".encode())
+    # os.write(1, f"Querying RAG with {query_text}\n".encode())
     # Prepare the DB.
     embedding_function = get_cohere_embeddings()
-    os.write(1, f"Got embeddings\n".encode())
+    # os.write(1, f"Got embeddings\n".encode())
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
-    os.write(1, f"Got DB\n".encode())
+    #os.write(1, f"Got DB\n".encode())
 
-    os.write(1, f"Searching DB\n".encode())
-    # Search the DB.
+    # os.write(1, f"Searching DB\n".encode())
     results = db.similarity_search_with_score(query_text, k=20)
-    os.write(1, f"Got results\n".encode())
+    # os.write(1, f"Got results\n".encode())
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=query_text)
-    # print(prompt)
+    # os.write(1, f"Prepared prompt\n".encode())
+    
     model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", api_key=GOOGLE_API_KEY)
-    os.write(1, f"Selected Model\n".encode())
-    response_text = model.invoke(prompt).content
-
-    sources = [doc.metadata.get("id", None) for doc, _score in results]
-    formatted_response = f"Response: {response_text}\nSources: {sources}"
-    # print(formatted_response)
-    return response_text
+    # os.write(1, f"Selected Model\n".encode())
+    
+    # Calling without stream parameter.
+    full_response = model.invoke(prompt)
+    # Extract content from the AIMessage object.
+    full_text = full_response.content
+    # Simulate streaming by splitting the full_text into chunks.
+    words = full_text.split()
+    chunk = ""
+    for word in words:
+        chunk += word + " "
+        # yield a chunk every 10 words.
+        if len(chunk.split()) >= 10:
+            yield chunk
+            chunk = ""
+            time.sleep(0.1)  # small delay to simulate streaming
+    if chunk:
+        yield chunk
 
 
 if __name__ == "__main__":
